@@ -29,7 +29,7 @@
 
         <section id="registration">
             <h2>Registration Form</h2>
-            <form id="registrationForm" action="https://js-form-data-capture.netlify.app/.netlify/functions/formHandler" method="POST">
+            <form id="registrationForm">
                 <div>
                     <label for="firstName">First Name:</label>
                     <input type="text" id="firstName" name="firstName" required>
@@ -282,7 +282,7 @@
 
         <section id="login">
             <h2>Login Form</h2>
-            <form id="loginForm" action="https://js-form-data-capture.netlify.app/.netlify/functions/formHandler" method="POST">
+            <form id="loginForm">
                 <div>
                     <label for="loginEmail">Email:</label>
                     <input type="email" id="loginEmail" name="loginEmail" required>
@@ -300,69 +300,27 @@
         </section>
     </main>
 
-    </footer>
-        <p>&copy; Abdulrahman Amuda | Web Developer | Machine Learning Enthusiast | Software Engineer</p>
-        <p>
-            <a href="privacy-policy.html">Privacy Policy</a> | 
-            <a href="terms-conditions.html">Terms & Conditions</a>
-        </p>
+</footer>
+<p>&copy; Abdulrahman Amuda | Web Developer | Machine Learning Enthusiast | Software Engineer</p>
+<p>
+    <a href="privacy-policy.html">Privacy Policy</a> | 
+    <a href="terms-conditions.html">Terms & Conditions</a>
+</p>
 
-        <div class="social-media">
-            <a href="https://x.com/RahmanAdis42469" target="_blank">
-                <i class="fab fa-twitter"></i> Twitter
-            </a>
-            <a href="https://www.instagram.com/rahman_xbarz/" target="_blank">
-                <i class="fab fa-instagram"></i> Instagram
-            </a>
-            <a href="https://www.facebook.com/Abdulrahman.Adisa.Amuda2000" target="_blank">
-                <i class="fab fa-facebook"></i> Facebook
-            </a>
-        </div>
-    </footer>
+<div class="social-media">
+    <a href="https://x.com/RahmanAdis42469" target="_blank">
+        <i class="fab fa-twitter"></i> Twitter
+    </a>
+    <a href="https://www.instagram.com/rahman_xbarz/" target="_blank">
+        <i class="fab fa-instagram"></i> Instagram
+    </a>
+    <a href="https://www.facebook.com/Abdulrahman.Adisa.Amuda2000" target="_blank">
+        <i class="fab fa-facebook"></i> Facebook
+    </a>
+</div>
+</footer>
 
-    <script>
-        // JavaScript for form validation
-        function validateForm() {
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const country = document.getElementById('country').value;
-            const terms = document.getElementById('terms').checked; // Terms and Conditions checkbox
-    
-            // Validate that all fields are filled
-            if (!firstName || !lastName || !email || !password || !confirmPassword || !country) {
-                alert('Please fill in all fields.');
-                return false;
-            }
-    
-            // Validate email format
-            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-            if (!emailPattern.test(email)) {
-                alert('Please enter a valid email address.');
-                return false;
-            }
-    
-            // Validate password length
-            if (password.length < 8) {
-                alert('Password must be at least 8 characters long.');
-                return false;
-            }
-    
-            // Validate passwords match
-            if (password !== confirmPassword) {
-                alert('Passwords do not match.');
-                return false;
-            }
-    
-            // Validate "Terms and Conditions" checkbox
-            if (!terms) {
-                alert('Please agree to the Terms and Conditions.');
-                return false;
-            }
-    
-            return true; // Allow form submission
-        }
-    </script>
-     
+<!-- Link the external JavaScript file for form validation and submission -->
+<script src="js/form-submit.js"></script>
+</body>
+</html>
