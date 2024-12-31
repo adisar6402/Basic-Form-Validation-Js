@@ -1,3 +1,6 @@
-[functions]
-directory = "netlify/functions"
+[build]
+  publish = "." # Publish the root folder where index.html is located
+  command = "" # Leave this empty since no build command is needed for plain HTML/JS/CSS
 
+[functions]
+  directory = "netlify/functions"
