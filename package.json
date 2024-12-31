@@ -1,0 +1,15 @@
+{
+  "name": "basic-form-validation-js",
+  "version": "1.0.0",
+  "description": "## Objective: The purpose of this assignment is to provide students with practical experience in implementing basic form validation using JavaScript. Students will learn how to ensure that user inputs meet specified criteria before form submission.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "nodemailer": "^6.9.16"
+  }
+}
