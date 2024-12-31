@@ -49,7 +49,7 @@ document.getElementById('registrationForm')?.addEventListener('submit', async (e
         return;
     }
 
-    const registrationEndpoint = '/submit-registration';
+    const registrationEndpoint = '/api/handle-registration'; // Updated endpoint
 
     try {
         const response = await fetch(registrationEndpoint, {
@@ -78,7 +78,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async (event) =
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData.entries());
 
-    const loginEndpoint = '/submit-login';
+    const loginEndpoint = '/api/handle-login'; // Updated endpoint
 
     try {
         const response = await fetch(loginEndpoint, {

@@ -1,5 +1,5 @@
 {
-  "name": "basic-form-validation-js",
+  "name": "basic-form-validation",
   "version": "1.0.0",
   "description": "A project demonstrating basic form validation with JavaScript and integration with Netlify Functions for backend processing.",
   "main": "index.js",
@@ -8,12 +8,21 @@
     "build": "netlify build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["form-validation", "javascript", "netlify-functions", "mongodb"],
+  "keywords": [
+    "form-validation",
+    "javascript",
+    "netlify-functions",
+    "mongodb"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "nodemailer": "^6.9.16",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.1.4",
+    "express": "^4.21.2",
     "mongodb": "^5.7.0",
-    "dotenv": "^16.1.4"
-  }
+    "nodemailer": "^6.9.16"
+  },
+  "devDependencies": {}
 }

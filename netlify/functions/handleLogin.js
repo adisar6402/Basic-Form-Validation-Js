@@ -1,14 +1,17 @@
 const { MongoClient } = require('mongodb');
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 require('dotenv').config(); // Load environment variables from .env
 
 exports.handler = async (event, context) => {
   try {
     // Parse incoming JSON data
     const body = JSON.parse(event.body);
+    console.log('Received login request:', body); // Log incoming data for debugging
 
     // Validation
     if (!body.username || !body.password) {
+      console.error('Missing required fields for login:', body);
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'Username and password are required.' }),
@@ -17,17 +20,20 @@ exports.handler = async (event, context) => {
 
     // Connect to MongoDB
     const client = new MongoClient(process.env.MONGODB_URI);
+    console.log('Connecting to MongoDB...');
     await client.connect();
+    console.log('MongoDB connected.');
+
     const database = client.db('user-auth');
     const usersCollection = database.collection('users');
 
-    // Check credentials in MongoDB
-    const user = await usersCollection.findOne({
-      username: body.username,
-      password: body.password, // Ideally, the password should be hashed in production!
-    });
+    // Find user in database
+    const user = await usersCollection.findOne({ username: body.username });
+    console.log('User found:', user ? true : false); // Log if the user exists
 
-    if (user) {
+    if (user && await bcrypt.compare(body.password, user.password)) {
+      console.log('Login successful for user:', user.username);
+
       // If user exists, send a success email
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -45,6 +51,7 @@ exports.handler = async (event, context) => {
       };
 
       await transporter.sendMail(mailOptions);
+      console.log('Login success email sent.');
 
       // Respond with success
       return {
@@ -55,7 +62,7 @@ exports.handler = async (event, context) => {
         }),
       };
     } else {
-      // Respond with invalid credentials
+      console.warn('Invalid credentials');
       return {
         statusCode: 401,
         body: JSON.stringify({ error: 'Invalid credentials.' }),
