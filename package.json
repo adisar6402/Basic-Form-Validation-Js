@@ -1,15 +1,18 @@
 {
   "name": "basic-form-validation-js",
   "version": "1.0.0",
-  "description": "## Objective: The purpose of this assignment is to provide students with practical experience in implementing basic form validation using JavaScript. Students will learn how to ensure that user inputs meet specified criteria before form submission.",
+  "description": "A project demonstrating basic form validation with JavaScript and integration with Netlify Functions for backend processing.",
   "main": "index.js",
   "scripts": {
+    "start": "netlify dev",
+    "build": "netlify build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["form-validation", "javascript", "netlify-functions", "mongodb"],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "nodemailer": "^6.9.16"
+    "nodemailer": "^6.9.16",
+    "mongodb": "^5.7.0"
   }
 }
