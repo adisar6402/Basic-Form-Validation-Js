@@ -1,53 +1,63 @@
-// script.js
+// Handle form submission dynamically
+async function handleFormSubmit(event, type) {
+    event.preventDefault();
 
-// Handle user login
-function handleLogin() {
-    // Get input values
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    const endpoint =
+        type === 'login' ? '/api/handle-login' : '/api/handle-registration';
 
-    // Perform login logic (this could be an API request or form validation)
-    if (username === '' || password === '') {
-        alert('Please fill in both username and password');
-        return;
+    try {
+        // Show loading indicator
+        showLoadingIndicator(true);
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            displayToast(result.error || 'An error occurred', 'error');
+        } else {
+            displayToast(result.message || 'Success', 'success');
+            if (type === 'login') {
+                console.log('Logged in successfully!');
+                // Redirect after login success if needed
+                window.location.href = '/dashboard';
+            } else {
+                console.log('Registered successfully!');
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        displayToast('Something went wrong. Please try again.', 'error');
+    } finally {
+        // Hide loading indicator
+        showLoadingIndicator(false);
     }
-
-    // Simulating login success (replace with actual logic)
-    alert('Login successful!');
-    console.log('Username:', username);
-    console.log('Password:', password); // Never log password in production
 }
 
-// Handle user registration
-function handleRegistration() {
-    // Get input values
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('regPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
+// Attach event listeners to forms
+document.getElementById('loginForm').addEventListener('submit', (e) => handleFormSubmit(e, 'login'));
+document.getElementById('registrationForm').addEventListener('submit', (e) => handleFormSubmit(e, 'registration'));
 
-    // Perform registration validation
-    if (name === '' || email === '' || password === '' || confirmPassword === '') {
-        alert('Please fill in all fields');
-        return;
+// Utility function: Show/hide loading indicator
+function showLoadingIndicator(show) {
+    const loader = document.getElementById('loadingIndicator');
+    if (loader) {
+        loader.style.display = show ? 'block' : 'none';
     }
-
-    if (password !== confirmPassword) {
-        alert('Passwords do not match');
-        return;
-    }
-
-    // Simulating registration success (replace with actual logic)
-    alert('Registration successful!');
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Password:', password); // Never log password in production
 }
 
-// Optional: You can use this to validate password strength
-function validatePasswordStrength(password) {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/; // Example: Minimum 6 characters, at least one letter and one number
-    return regex.test(password);
+// Utility function: Display toast message
+function displayToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerText = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
-
-// Optional: Additional validation or helper functions can go here
