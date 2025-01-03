@@ -7,6 +7,9 @@ exports.handler = async (event) => {
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
+            headers: {
+                "X-Content-Type-Options": "nosniff",  // Adding this header for security
+            },
             body: JSON.stringify({ error: 'Method not allowed' }),
         };
     }
@@ -30,6 +33,9 @@ exports.handler = async (event) => {
             if (validationError) {
                 return {
                     statusCode: 400,
+                    headers: {
+                        "X-Content-Type-Options": "nosniff",  // Adding this header for validation response
+                    },
                     body: JSON.stringify(validationError),
                 };
             }
@@ -38,6 +44,9 @@ exports.handler = async (event) => {
             if (existingUser) {
                 return {
                     statusCode: 409,
+                    headers: {
+                        "X-Content-Type-Options": "nosniff",  // Adding this header for error response
+                    },
                     body: JSON.stringify({ field: 'email', message: 'User already exists.' }),
                 };
             }
@@ -47,6 +56,9 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 201,
+                headers: {
+                    "X-Content-Type-Options": "nosniff",  // Adding this header for success response
+                },
                 body: JSON.stringify({ message: 'Registration successful.' }),
             };
         }
@@ -56,6 +68,9 @@ exports.handler = async (event) => {
             if (!user || !(await bcrypt.compare(data.password, user.password))) {
                 return {
                     statusCode: 401,
+                    headers: {
+                        "X-Content-Type-Options": "nosniff",  // Adding this header for login failure
+                    },
                     body: JSON.stringify({ field: 'email', message: 'Invalid credentials.' }),
                 };
             }
@@ -78,18 +93,27 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 200,
+                headers: {
+                    "X-Content-Type-Options": "nosniff",  // Adding this header for login success
+                },
                 body: JSON.stringify({ message: 'Login successful.' }),
             };
         }
 
         return {
             statusCode: 404,
+            headers: {
+                "X-Content-Type-Options": "nosniff",  // Adding this header for invalid route error
+            },
             body: JSON.stringify({ error: 'Invalid route.' }),
         };
     } catch (error) {
         console.error('Error:', error.message);
         return {
             statusCode: 500,
+            headers: {
+                "X-Content-Type-Options": "nosniff",  // Adding this header for internal error
+            },
             body: JSON.stringify({ error: 'Internal Server Error' }),
         };
     } finally {

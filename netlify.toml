@@ -4,3 +4,22 @@
 
 [functions]
   directory = "netlify/functions"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*" # Allow all origins; adjust based on security needs
+    Access-Control-Allow-Methods = "POST, OPTIONS" # Methods allowed for serverless functions
+    Access-Control-Allow-Headers = "Content-Type" # Allow content-type header
+
+[[redirects]]
+  from = "/api/handle-login"
+  to = "/api/form-submit"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/handle-registration"
+  to = "/api/form-submit"
+  status = 200
+  force = true
