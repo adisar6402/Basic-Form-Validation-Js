@@ -7,15 +7,30 @@ exports.handler = async (event) => {
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
-            headers: {
-                "X-Content-Type-Options": "nosniff",  // Adding this header for security
-            },
+            headers: { "X-Content-Type-Options": "nosniff" },
             body: JSON.stringify({ error: 'Method not allowed' }),
         };
     }
 
+    let data;
+
+    try {
+        // Ensure event.body is properly parsed
+        if (!event.body) {
+            throw new Error('Request body is missing');
+        }
+
+        data = JSON.parse(event.body);
+    } catch (parseError) {
+        console.error('Error parsing event.body:', parseError.message);
+        return {
+            statusCode: 400,
+            headers: { "X-Content-Type-Options": "nosniff" },
+            body: JSON.stringify({ error: 'Invalid JSON input' }),
+        };
+    }
+
     const path = event.path;
-    const data = JSON.parse(event.body);
 
     let client;
     try {
@@ -25,6 +40,7 @@ exports.handler = async (event) => {
             serverSelectionTimeoutMS: 5000,
         });
         await client.connect();
+
         const database = client.db('user-auth');
         const usersCollection = database.collection('users');
 
@@ -34,9 +50,7 @@ exports.handler = async (event) => {
             if (validationError) {
                 return {
                     statusCode: 400,
-                    headers: {
-                        "X-Content-Type-Options": "nosniff",  // Adding this header for validation response
-                    },
+                    headers: { "X-Content-Type-Options": "nosniff" },
                     body: JSON.stringify(validationError),
                 };
             }
@@ -45,9 +59,7 @@ exports.handler = async (event) => {
             if (existingUser) {
                 return {
                     statusCode: 409,
-                    headers: {
-                        "X-Content-Type-Options": "nosniff",  // Adding this header for error response
-                    },
+                    headers: { "X-Content-Type-Options": "nosniff" },
                     body: JSON.stringify({ field: 'email', message: 'User already exists.' }),
                 };
             }
@@ -57,27 +69,22 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 201,
-                headers: {
-                    "X-Content-Type-Options": "nosniff",  // Adding this header for success response
-                },
+                headers: { "X-Content-Type-Options": "nosniff" },
                 body: JSON.stringify({ message: 'Registration successful.' }),
             };
         }
 
-        // Handling login
+        // Handle login
         if (path.includes('handle-login')) {
             const user = await usersCollection.findOne({ email: data.email });
             if (!user || !(await bcrypt.compare(data.password, user.password))) {
                 return {
                     statusCode: 401,
-                    headers: {
-                        "X-Content-Type-Options": "nosniff",  // Adding this header for login failure
-                    },
+                    headers: { "X-Content-Type-Options": "nosniff" },
                     body: JSON.stringify({ field: 'email', message: 'Invalid credentials.' }),
                 };
             }
 
-            // Sending email notification about successful login
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -96,28 +103,22 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 200,
-                headers: {
-                    "X-Content-Type-Options": "nosniff",  // Adding this header for login success
-                },
+                headers: { "X-Content-Type-Options": "nosniff" },
                 body: JSON.stringify({ message: 'Login successful.' }),
             };
         }
 
-        // Invalid route handling
+        // Invalid route
         return {
             statusCode: 404,
-            headers: {
-                "X-Content-Type-Options": "nosniff",  // Adding this header for invalid route error
-            },
+            headers: { "X-Content-Type-Options": "nosniff" },
             body: JSON.stringify({ error: 'Invalid route.' }),
         };
     } catch (error) {
         console.error('Error:', error.message);
         return {
             statusCode: 500,
-            headers: {
-                "X-Content-Type-Options": "nosniff",  // Adding this header for internal error
-            },
+            headers: { "X-Content-Type-Options": "nosniff" },
             body: JSON.stringify({ error: 'Internal Server Error' }),
         };
     } finally {
@@ -127,7 +128,7 @@ exports.handler = async (event) => {
     }
 };
 
-// Registration validation function
+// Registration validation function (unchanged)
 function validateRegistrationForm(data) {
     const { firstName, lastName, email, password, confirmPassword, country, terms } = data;
 
