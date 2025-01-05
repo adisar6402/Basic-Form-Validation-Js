@@ -31,21 +31,21 @@ exports.handler = async (event) => {
     }
 
     const path = event.path;
-    let client;
 
+    let client;
     try {
         client = new MongoClient(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             serverSelectionTimeoutMS: 5000,
         });
-
         await client.connect();
+
         const database = client.db('user-auth');
         const usersCollection = database.collection('users');
 
-        // Handling registration
-        if (path.includes('handle-registration')) {
+        // Handle registration
+        if (data.action === 'registration') {
             const validationError = validateRegistrationForm(data);
             if (validationError) {
                 return {
@@ -75,7 +75,7 @@ exports.handler = async (event) => {
         }
 
         // Handle login
-        if (path.includes('handle-login')) {
+        if (data.action === 'login') {
             const user = await usersCollection.findOne({ email: data.email });
             if (!user || !(await bcrypt.compare(data.password, user.password))) {
                 return {
@@ -115,15 +115,15 @@ exports.handler = async (event) => {
             body: JSON.stringify({ error: 'Invalid route.' }),
         };
     } catch (error) {
-        console.error('Error processing the request:', error.message);
+        console.error('Error:', error.message);
         return {
             statusCode: 500,
             headers: { "X-Content-Type-Options": "nosniff" },
-            body: JSON.stringify({ error: 'Internal Server Error', details: error.message }),
+            body: JSON.stringify({ error: 'Internal Server Error' }),
         };
     } finally {
         if (client) {
-            await client.close();
+            client.close();
         }
     }
 };

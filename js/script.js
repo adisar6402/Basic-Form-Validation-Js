@@ -9,8 +9,6 @@ function showAlert(formType) {
     }
 }
 
-// JavaScript for form validation and submission
-
 // Event listener for the contact form submission
 document.getElementById("contactForm").addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent default form submission
