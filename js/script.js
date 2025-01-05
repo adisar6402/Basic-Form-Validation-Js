@@ -44,18 +44,18 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
         return;
     }
 
-    // Post the data to the server
+    // Post the data to the server as JSON
     const loginData = {
         email: loginEmail,
         password: loginPassword,
     };
 
-    fetch("/.netlify/functions/form-submit/handle-login", {
+    fetch("/.netlify/functions/form-submit", {  // Make sure the correct endpoint is here
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json",  // Set content-type as JSON
         },
-        body: JSON.stringify(loginData),
+        body: JSON.stringify({ action: 'login', ...loginData })  // Include an action key to differentiate from registration
     })
         .then((response) => {
             if (response.ok) {
@@ -65,8 +65,9 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
             }
         })
         .then((data) => {
+            showAlert('login');  // Show the alert on successful login
             alert("Login successful! Welcome back.");
-            // Redirect or handle login success
+            // Handle login success or redirect
         })
         .catch((error) => {
             console.error(error);
@@ -93,18 +94,18 @@ document.getElementById("registrationForm").addEventListener("submit", function 
         return;
     }
 
-    // Post the data to the server
+    // Post the data to the server as JSON
     const registrationData = {
         email: regEmail,
         password: regPassword,
     };
 
-    fetch("/.netlify/functions/form-submit/handle-registration", {
+    fetch("/.netlify/functions/form-submit", {  // Same endpoint for both actions
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json",  // Set content-type as JSON
         },
-        body: JSON.stringify(registrationData),
+        body: JSON.stringify({ action: 'registration', ...registrationData })  // Include action key to specify registration
     })
         .then((response) => {
             if (response.ok) {

@@ -26,21 +26,21 @@ exports.handler = async (event) => {
         return {
             statusCode: 400,
             headers: { "X-Content-Type-Options": "nosniff" },
-            body: JSON.stringify({ error: 'Invalid JSON input' }),
+            body: JSON.stringify({ error: 'Invalid JSON input', details: parseError.message }),
         };
     }
 
     const path = event.path;
-
     let client;
+
     try {
         client = new MongoClient(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             serverSelectionTimeoutMS: 5000,
         });
-        await client.connect();
 
+        await client.connect();
         const database = client.db('user-auth');
         const usersCollection = database.collection('users');
 
@@ -115,15 +115,15 @@ exports.handler = async (event) => {
             body: JSON.stringify({ error: 'Invalid route.' }),
         };
     } catch (error) {
-        console.error('Error:', error.message);
+        console.error('Error processing the request:', error.message);
         return {
             statusCode: 500,
             headers: { "X-Content-Type-Options": "nosniff" },
-            body: JSON.stringify({ error: 'Internal Server Error' }),
+            body: JSON.stringify({ error: 'Internal Server Error', details: error.message }),
         };
     } finally {
         if (client) {
-            client.close();
+            await client.close();
         }
     }
 };
