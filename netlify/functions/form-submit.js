@@ -128,7 +128,7 @@ exports.handler = async (event) => {
     }
 };
 
-// Registration validation function (unchanged)
+// Registration validation function
 function validateRegistrationForm(data) {
     const { firstName, lastName, email, password, confirmPassword, country, terms } = data;
 

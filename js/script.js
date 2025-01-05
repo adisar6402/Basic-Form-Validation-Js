@@ -1,3 +1,14 @@
+// Function to show an alert
+function showAlert(formType) {
+    if (formType === 'registration') {
+        alert("Registration form submitted!");
+    } else if (formType === 'login') {
+        alert("Login form submitted!");
+    } else {
+        alert("Form submitted!");
+    }
+}
+
 // JavaScript for form validation and submission
 
 // Event listener for the contact form submission
@@ -103,8 +114,9 @@ document.getElementById("registrationForm").addEventListener("submit", function 
             }
         })
         .then((data) => {
+            showAlert('registration');  // Show the alert on successful registration
             alert("Registration successful! You can now log in.");
-            // Redirect or handle registration success
+            // Handle registration success or redirect
         })
         .catch((error) => {
             console.error(error);
