@@ -28,6 +28,7 @@ exports.handler = async (event) => {
         const database = client.db('user-auth');
         const usersCollection = database.collection('users');
 
+        // Handling registration
         if (path.includes('handle-registration')) {
             const validationError = validateRegistrationForm(data);
             if (validationError) {
@@ -63,6 +64,7 @@ exports.handler = async (event) => {
             };
         }
 
+        // Handling login
         if (path.includes('handle-login')) {
             const user = await usersCollection.findOne({ email: data.email });
             if (!user || !(await bcrypt.compare(data.password, user.password))) {
@@ -75,6 +77,7 @@ exports.handler = async (event) => {
                 };
             }
 
+            // Sending email notification about successful login
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -100,6 +103,7 @@ exports.handler = async (event) => {
             };
         }
 
+        // Invalid route handling
         return {
             statusCode: 404,
             headers: {
@@ -123,6 +127,7 @@ exports.handler = async (event) => {
     }
 };
 
+// Registration validation function
 function validateRegistrationForm(data) {
     const { firstName, lastName, email, password, confirmPassword, country, terms } = data;
 

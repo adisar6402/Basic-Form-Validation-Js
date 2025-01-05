@@ -1,66 +1,113 @@
-// Handle form submission dynamically
-async function handleFormSubmit(event, formType) {
+// JavaScript for form validation and submission
+
+// Event listener for the contact form submission
+document.getElementById("contactForm").addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent default form submission
 
-    const form = event.target;
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+    // Validate the form fields
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const message = document.getElementById("message").value.trim();
 
-    // Define API endpoint dynamically based on form type
-    const endpoint = formType === 'login' ? '/api/handle-login' : '/api/form-submit';
+    if (name === "" || email === "" || message === "") {
+        alert("All fields are required. Please fill them out.");
+        return;
+    }
 
-    try {
-        // Show loading indicator while submitting
-        showLoadingIndicator(true);
+    // Simulate successful submission
+    alert("Thank you for reaching out, " + name + "! Your message has been received.");
+    // Clear form fields
+    document.getElementById("contactForm").reset();
+});
 
-        // Make a POST request to the endpoint
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
+// Event listener for the login form submission
+document.getElementById("loginForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent default form submission
 
-        const result = await response.json();
+    // Validate the form fields
+    const loginEmail = document.getElementById("loginEmail").value.trim();
+    const loginPassword = document.getElementById("loginPassword").value.trim();
 
-        // Handle server response
-        if (!response.ok) {
-            displayToast(result.error || 'An error occurred', 'error');
-        } else {
-            displayToast(result.message || 'Success', 'success');
-            if (formType === 'login') {
-                console.log('Logged in successfully!');
-                // Redirect after login success if needed
-                window.location.href = '/dashboard';
+    if (loginEmail === "" || loginPassword === "") {
+        alert("Both email and password are required to log in.");
+        return;
+    }
+
+    // Post the data to the server
+    const loginData = {
+        email: loginEmail,
+        password: loginPassword,
+    };
+
+    fetch("/.netlify/functions/form-submit/handle-login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
             } else {
-                console.log('Registered successfully!');
+                throw new Error("Login failed.");
             }
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        displayToast('Something went wrong. Please try again.', 'error');
-    } finally {
-        // Hide loading indicator after submission
-        showLoadingIndicator(false);
+        })
+        .then((data) => {
+            alert("Login successful! Welcome back.");
+            // Redirect or handle login success
+        })
+        .catch((error) => {
+            console.error(error);
+            alert("An error occurred during login. Please try again.");
+        });
+});
+
+// Event listener for the registration form submission
+document.getElementById("registrationForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Validate the form fields
+    const regEmail = document.getElementById("regEmail").value.trim();
+    const regPassword = document.getElementById("regPassword").value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+    if (regEmail === "" || regPassword === "" || confirmPassword === "") {
+        alert("All fields are required. Please fill them out.");
+        return;
     }
-}
 
-// Attach event listeners to forms and prevent default actions
-document.getElementById('loginForm')?.addEventListener('submit', (e) => handleFormSubmit(e, 'login'));
-document.getElementById('registrationForm')?.addEventListener('submit', (e) => handleFormSubmit(e, 'registration'));
-
-// Utility function: Show/hide loading indicator
-function showLoadingIndicator(show) {
-    const loader = document.getElementById('loadingIndicator');
-    if (loader) {
-        loader.style.display = show ? 'block' : 'none';
+    if (regPassword !== confirmPassword) {
+        alert("Passwords do not match. Please try again.");
+        return;
     }
-}
 
-// Utility function: Display toast message to notify users
-function displayToast(message, type) {
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerText = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-}
+    // Post the data to the server
+    const registrationData = {
+        email: regEmail,
+        password: regPassword,
+    };
+
+    fetch("/.netlify/functions/form-submit/handle-registration", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registrationData),
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error("Registration failed.");
+            }
+        })
+        .then((data) => {
+            alert("Registration successful! You can now log in.");
+            // Redirect or handle registration success
+        })
+        .catch((error) => {
+            console.error(error);
+            alert("An error occurred during registration. Please try again.");
+        });
+});

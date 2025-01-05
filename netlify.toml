@@ -1,25 +1,25 @@
 [build]
-  publish = "." # Publish the root folder where index.html is located
-  command = "" # Leave this empty since no build command is needed for plain HTML/JS/CSS
+  publish = "." # Root folder where index.html is located
+  command = "" # No build command needed for plain HTML/JS/CSS
 
 [functions]
-  directory = "netlify/functions"
+  directory = "netlify/functions" # Folder where form-submit.js is located
 
 [[headers]]
-  for = "/api/*"
+  for = "/api/*" # Headers apply to all API routes
   [headers.values]
-    Access-Control-Allow-Origin = "*" # Allow all origins; adjust based on security needs
-    Access-Control-Allow-Methods = "POST, OPTIONS" # Methods allowed for serverless functions
-    Access-Control-Allow-Headers = "Content-Type" # Allow content-type header
+    Access-Control-Allow-Origin = "*" # Allow requests from all origins
+    Access-Control-Allow-Methods = "POST, OPTIONS" # Supported methods
+    Access-Control-Allow-Headers = "Content-Type" # Allow content-type header for JSON requests
 
 [[redirects]]
-  from = "/api/handle-login"
-  to = "/api/form-submit"
-  status = 200
-  force = true
+  from = "/api/handle-login" # Redirect for login form submission
+  to = "/.netlify/functions/form-submit"
+  status = 200 # HTTP OK
+  force = true # Force the redirect
 
 [[redirects]]
-  from = "/api/handle-registration"
-  to = "/api/form-submit"
-  status = 200
-  force = true
+  from = "/api/handle-registration" # Redirect for registration form submission
+  to = "/.netlify/functions/form-submit"
+  status = 200 # HTTP OK
+  force = true # Force the redirect
