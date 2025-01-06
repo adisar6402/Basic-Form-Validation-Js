@@ -17,6 +17,30 @@ function toggleLoadingIndicator(show) {
     }
 }
 
+// Function to send a POST request
+async function sendPostRequest(url, payload) {
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload), // Ensure proper JSON
+        });
+
+        // Check if the response is okay
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Request failed");
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error:", error.message);
+        throw error;
+    }
+}
+
 // Event listener for the contact form submission
 document.getElementById("contactForm").addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent default form submission
@@ -38,7 +62,7 @@ document.getElementById("contactForm").addEventListener("submit", function (even
 });
 
 // Event listener for the login form submission
-document.getElementById("loginForm").addEventListener("submit", function (event) {
+document.getElementById("loginForm").addEventListener("submit", async function (event) {
     event.preventDefault(); // Prevent default form submission
 
     // Show loading indicator
@@ -54,39 +78,27 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
         return;
     }
 
-    // Post the data to the server as JSON
+    // Prepare the data
     const loginData = {
+        action: 'login',
         email: loginEmail,
         password: loginPassword,
     };
 
-    fetch("/.netlify/functions/form-submit", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action: 'login', ...loginData })
-    })
-        .then((response) => {
-            toggleLoadingIndicator(false); // Hide loading indicator
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error("Login failed. Invalid credentials or server error.");
-            }
-        })
-        .then((data) => {
-            showAlert('login');
-            alert("Login successful! Welcome back.");
-        })
-        .catch((error) => {
-            console.error(error);
-            alert("An error occurred during login. Please try again.");
-        });
+    try {
+        // Send POST request
+        const data = await sendPostRequest("/.netlify/functions/form-submit", loginData);
+        toggleLoadingIndicator(false);
+        showAlert('login');
+        alert("Login successful! Welcome back.");
+    } catch (error) {
+        toggleLoadingIndicator(false);
+        alert("An error occurred during login: " + error.message);
+    }
 });
 
 // Event listener for the registration form submission
-document.getElementById("registrationForm").addEventListener("submit", function (event) {
+document.getElementById("registrationForm").addEventListener("submit", async function (event) {
     event.preventDefault(); // Prevent default form submission
 
     // Show loading indicator
@@ -109,33 +121,21 @@ document.getElementById("registrationForm").addEventListener("submit", function 
         return;
     }
 
-    // Post the data to the server as JSON
+    // Prepare the data
     const registrationData = {
+        action: 'registration',
         email: regEmail,
         password: regPassword,
     };
 
-    fetch("/.netlify/functions/form-submit", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action: 'registration', ...registrationData })
-    })
-        .then((response) => {
-            toggleLoadingIndicator(false); // Hide loading indicator
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error("Registration failed. Email may already be in use.");
-            }
-        })
-        .then((data) => {
-            showAlert('registration');
-            alert("Registration successful! You can now log in.");
-        })
-        .catch((error) => {
-            console.error(error);
-            alert("An error occurred during registration. Please try again.");
-        });
+    try {
+        // Send POST request
+        const data = await sendPostRequest("/.netlify/functions/form-submit", registrationData);
+        toggleLoadingIndicator(false);
+        showAlert('registration');
+        alert("Registration successful! You can now log in.");
+    } catch (error) {
+        toggleLoadingIndicator(false);
+        alert("An error occurred during registration: " + error.message);
+    }
 });

@@ -13,13 +13,7 @@
     Access-Control-Allow-Headers = "Content-Type" # Allow content-type header for JSON requests
 
 [[redirects]]
-  from = "/api/handle-login" # Redirect for login form submission
-  to = "/.netlify/functions/form-submit"
+  from = "/form-submit" # Match the endpoint used in your client-side JavaScript
+  to = "/.netlify/functions/form-submit" # Points to your Netlify Function
   status = 200 # HTTP OK
-  force = true # Force the redirect
-
-[[redirects]]
-  from = "/api/handle-registration" # Redirect for registration form submission
-  to = "/.netlify/functions/form-submit"
-  status = 200 # HTTP OK
-  force = true # Force the redirect
+  force = true # Force the redirect, ensuring it's not cached elsewhere
