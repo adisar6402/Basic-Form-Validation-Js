@@ -9,6 +9,14 @@ function showAlert(formType) {
     }
 }
 
+// Function to show or hide the loading indicator
+function toggleLoadingIndicator(show) {
+    const loadingIndicator = document.getElementById("loadingIndicator");
+    if (loadingIndicator) {
+        loadingIndicator.style.display = show ? "block" : "none";
+    }
+}
+
 // Event listener for the contact form submission
 document.getElementById("contactForm").addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent default form submission
@@ -33,12 +41,16 @@ document.getElementById("contactForm").addEventListener("submit", function (even
 document.getElementById("loginForm").addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent default form submission
 
+    // Show loading indicator
+    toggleLoadingIndicator(true);
+
     // Validate the form fields
     const loginEmail = document.getElementById("loginEmail").value.trim();
     const loginPassword = document.getElementById("loginPassword").value.trim();
 
     if (loginEmail === "" || loginPassword === "") {
         alert("Both email and password are required to log in.");
+        toggleLoadingIndicator(false); // Hide loading indicator
         return;
     }
 
@@ -48,24 +60,24 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
         password: loginPassword,
     };
 
-    fetch("/.netlify/functions/form-submit", {  // Make sure the correct endpoint is here
+    fetch("/.netlify/functions/form-submit", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",  // Set content-type as JSON
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify({ action: 'login', ...loginData })  // Include an action key to differentiate from registration
+        body: JSON.stringify({ action: 'login', ...loginData })
     })
         .then((response) => {
+            toggleLoadingIndicator(false); // Hide loading indicator
             if (response.ok) {
                 return response.json();
             } else {
-                throw new Error("Login failed.");
+                throw new Error("Login failed. Invalid credentials or server error.");
             }
         })
         .then((data) => {
-            showAlert('login');  // Show the alert on successful login
+            showAlert('login');
             alert("Login successful! Welcome back.");
-            // Handle login success or redirect
         })
         .catch((error) => {
             console.error(error);
@@ -77,6 +89,9 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
 document.getElementById("registrationForm").addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent default form submission
 
+    // Show loading indicator
+    toggleLoadingIndicator(true);
+
     // Validate the form fields
     const regEmail = document.getElementById("regEmail").value.trim();
     const regPassword = document.getElementById("regPassword").value.trim();
@@ -84,11 +99,13 @@ document.getElementById("registrationForm").addEventListener("submit", function 
 
     if (regEmail === "" || regPassword === "" || confirmPassword === "") {
         alert("All fields are required. Please fill them out.");
+        toggleLoadingIndicator(false); // Hide loading indicator
         return;
     }
 
     if (regPassword !== confirmPassword) {
         alert("Passwords do not match. Please try again.");
+        toggleLoadingIndicator(false); // Hide loading indicator
         return;
     }
 
@@ -98,24 +115,24 @@ document.getElementById("registrationForm").addEventListener("submit", function 
         password: regPassword,
     };
 
-    fetch("/.netlify/functions/form-submit", {  // Same endpoint for both actions
+    fetch("/.netlify/functions/form-submit", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",  // Set content-type as JSON
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify({ action: 'registration', ...registrationData })  // Include action key to specify registration
+        body: JSON.stringify({ action: 'registration', ...registrationData })
     })
         .then((response) => {
+            toggleLoadingIndicator(false); // Hide loading indicator
             if (response.ok) {
                 return response.json();
             } else {
-                throw new Error("Registration failed.");
+                throw new Error("Registration failed. Email may already be in use.");
             }
         })
         .then((data) => {
-            showAlert('registration');  // Show the alert on successful registration
+            showAlert('registration');
             alert("Registration successful! You can now log in.");
-            // Handle registration success or redirect
         })
         .catch((error) => {
             console.error(error);
