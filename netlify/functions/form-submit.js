@@ -1,6 +1,7 @@
 const { MongoClient } = require('mongodb');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
+const querystring = require('querystring');
 require('dotenv').config();
 
 exports.handler = async (event) => {
@@ -20,13 +21,22 @@ exports.handler = async (event) => {
             throw new Error('Request body is missing');
         }
 
-        data = JSON.parse(event.body);
+        const contentType = event.headers["content-type"] || event.headers["Content-Type"];
+        if (contentType.includes("application/json")) {
+            // For JSON content type
+            data = JSON.parse(event.body);
+        } else if (contentType.includes("application/x-www-form-urlencoded")) {
+            // For URL-encoded content type
+            data = querystring.parse(event.body);
+        } else {
+            throw new Error('Unsupported content type');
+        }
     } catch (parseError) {
         console.error('Error parsing event.body:', parseError.message);
         return {
             statusCode: 400,
             headers: { "X-Content-Type-Options": "nosniff" },
-            body: JSON.stringify({ error: 'Invalid JSON input', details: parseError.message }),
+            body: JSON.stringify({ error: 'Invalid JSON input or unsupported content type', details: parseError.message }),
         };
     }
 
@@ -119,7 +129,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 500,
             headers: { "X-Content-Type-Options": "nosniff" },
-            body: JSON.stringify({ error: 'Internal Server Error' }),
+            body: JSON.stringify({ error: 'Internal Server Error', details: error.message }),
         };
     } finally {
         if (client) {
