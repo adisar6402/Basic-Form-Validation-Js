@@ -6,7 +6,7 @@
   directory = "netlify/functions" # Folder where form-submit.js is located
 
 [[headers]]
-  for = "/api/*" # Headers apply to all API routes
+  for = "/.netlify/functions/form-submit" # Apply headers only to your function's endpoint
   [headers.values]
     Access-Control-Allow-Origin = "*" # Allow requests from all origins
     Access-Control-Allow-Methods = "POST, OPTIONS" # Supported methods

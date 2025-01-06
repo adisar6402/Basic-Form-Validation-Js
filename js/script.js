@@ -79,6 +79,14 @@ document.getElementById("registrationForm").addEventListener("submit", function 
         return;
     }
 
+    // Email format validation
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailRegex.test(regEmail)) {
+        alert("Please enter a valid email address.");
+        toggleLoadingIndicator(false);
+        return;
+    }
+
     const registrationData = {
         action: "registration",
         email: regEmail,

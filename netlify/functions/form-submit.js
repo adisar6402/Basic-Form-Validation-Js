@@ -44,6 +44,18 @@ exports.handler = async (event) => {
 
     let client;
     try {
+        // Log MongoDB URI to check if it's loading correctly
+        console.log('MongoDB URI:', process.env.MONGODB_URI);
+
+        // Ensure MongoDB URI is properly set
+        if (!process.env.MONGODB_URI) {
+            return {
+                statusCode: 500,
+                headers: { "X-Content-Type-Options": "nosniff" },
+                body: JSON.stringify({ error: 'MongoDB URI is missing from environment variables' }),
+            };
+        }
+
         client = new MongoClient(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
