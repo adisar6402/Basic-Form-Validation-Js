@@ -11,107 +11,85 @@ function toggleLoadingIndicator(show) {
     }
 }
 
-// Event listener for login form submission
-document.getElementById("loginForm").addEventListener("submit", function (event) {
+// Function to handle form submission (Login or Registration)
+async function handleFormSubmit(event, formType) {
     event.preventDefault();
-
+    
     // Show loading indicator
     toggleLoadingIndicator(true);
 
-    const loginEmail = document.getElementById("loginEmail").value.trim();
-    const loginPassword = document.getElementById("loginPassword").value.trim();
+    // Get form data and trim any leading/trailing whitespace
+    const form = event.target;
+    const formData = new FormData(form);
+    const formObject = Object.fromEntries(formData.entries());
+    
+    // Validate inputs based on formType
+    if (formType === "login") {
+        const { email, password } = formObject;
 
-    if (loginEmail === "" || loginPassword === "") {
-        alert("Both email and password are required.");
-        toggleLoadingIndicator(false);
-        return;
+        if (email === "" || password === "") {
+            alert("Both email and password are required.");
+            toggleLoadingIndicator(false);
+            return;
+        }
+
+        formObject.action = "login";
+    } else if (formType === "registration") {
+        const { email, password, confirmPassword } = formObject;
+
+        if (email === "" || password === "" || confirmPassword === "") {
+            alert("All fields are required.");
+            toggleLoadingIndicator(false);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match.");
+            toggleLoadingIndicator(false);
+            return;
+        }
+
+        // Email format validation
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        if (!emailRegex.test(email)) {
+            alert("Please enter a valid email address.");
+            toggleLoadingIndicator(false);
+            return;
+        }
+
+        formObject.action = "registration";
     }
 
-    const loginData = {
-        action: "login",
-        email: loginEmail,
-        password: loginPassword,
-    };
-
-    fetch("/.netlify/functions/form-submit", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginData),
-    })
-        .then((response) => {
-            toggleLoadingIndicator(false);
-            if (!response.ok) {
-                throw new Error("Login failed.");
-            }
-            return response.json();
-        })
-        .then((data) => {
-            showAlert("Login");
-            console.log(data);
-        })
-        .catch((error) => {
-            alert("Error during login: " + error.message);
+    try {
+        const response = await fetch("/.netlify/functions/form-submit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formObject),
         });
+
+        toggleLoadingIndicator(false);
+
+        if (!response.ok) {
+            throw new Error(`${formType.charAt(0).toUpperCase() + formType.slice(1)} failed.`);
+        }
+
+        const data = await response.json();
+        showAlert(formType.charAt(0).toUpperCase() + formType.slice(1));
+        console.log(data);
+    } catch (error) {
+        toggleLoadingIndicator(false);
+        alert(`${formType.charAt(0).toUpperCase() + formType.slice(1)} error: ${error.message}`);
+    }
+}
+
+// Event listener for login form submission
+document.getElementById("loginForm").addEventListener("submit", function (event) {
+    handleFormSubmit(event, "login");
 });
 
 // Event listener for registration form submission
 document.getElementById("registrationForm").addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    // Show loading indicator
-    toggleLoadingIndicator(true);
-
-    const regEmail = document.getElementById("regEmail").value.trim();
-    const regPassword = document.getElementById("regPassword").value.trim();
-    const confirmPassword = document.getElementById("confirmPassword").value.trim();
-
-    if (regEmail === "" || regPassword === "" || confirmPassword === "") {
-        alert("All fields are required.");
-        toggleLoadingIndicator(false);
-        return;
-    }
-
-    if (regPassword !== confirmPassword) {
-        alert("Passwords do not match.");
-        toggleLoadingIndicator(false);
-        return;
-    }
-
-    // Email format validation
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if (!emailRegex.test(regEmail)) {
-        alert("Please enter a valid email address.");
-        toggleLoadingIndicator(false);
-        return;
-    }
-
-    const registrationData = {
-        action: "registration",
-        email: regEmail,
-        password: regPassword,
-    };
-
-    fetch("/.netlify/functions/form-submit", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(registrationData),
-    })
-        .then((response) => {
-            toggleLoadingIndicator(false);
-            if (!response.ok) {
-                throw new Error("Registration failed.");
-            }
-            return response.json();
-        })
-        .then((data) => {
-            showAlert("Registration");
-            console.log(data);
-        })
-        .catch((error) => {
-            alert("Error during registration: " + error.message);
-        });
+    handleFormSubmit(event, "registration");
 });

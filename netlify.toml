@@ -1,19 +1,19 @@
 [build]
-  publish = "." # Root folder where index.html is located
-  command = "" # No build command needed for plain HTML/JS/CSS
+  publish = "."  # The root folder where your index.html file is
+  command = ""    # No build command needed for plain HTML/JS/CSS
 
 [functions]
-  directory = "netlify/functions" # Folder where form-submit.js is located
+  directory = "netlify/functions"  # Folder where your form-submit.js is
 
 [[headers]]
-  for = "/.netlify/functions/form-submit" # Apply headers only to your function's endpoint
+  for = "/.netlify/functions/form-submit"
   [headers.values]
-    Access-Control-Allow-Origin = "*" # Allow requests from all origins
-    Access-Control-Allow-Methods = "POST, OPTIONS" # Supported methods
-    Access-Control-Allow-Headers = "Content-Type" # Allow content-type header for JSON requests
+    Access-Control-Allow-Origin = "*"  # Allow any origin for CORS
+    Access-Control-Allow-Methods = "POST, OPTIONS"  # Allow POST and OPTIONS methods
+    Access-Control-Allow-Headers = "Content-Type"  # Allow the Content-Type header for POST requests
 
 [[redirects]]
-  from = "/.netlify/functions/form-submit" # Match the endpoint used in your client-side JavaScript
-  to = "/.netlify/functions/form-submit" # Points to your Netlify Function
-  status = 200 # HTTP OK
-  force = true # Force the redirect, ensuring it's not cached elsewhere
+  from = "/form-submit"  # Matching client-side endpoint
+  to = "/.netlify/functions/form-submit"  # Points to Netlify function
+  status = 200           # OK status
+  force = true           # Ensures that the redirect is applied
