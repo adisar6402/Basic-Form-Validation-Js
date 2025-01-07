@@ -61,7 +61,7 @@ async function handleFormSubmit(event, formType) {
     }
 
     try {
-        const response = await fetch("/.netlify/functions/form-submit", {
+        const response = await fetch(form.action, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
