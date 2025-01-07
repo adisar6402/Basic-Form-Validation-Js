@@ -23,10 +23,8 @@ exports.handler = async (event) => {
 
         const contentType = event.headers["content-type"] || event.headers["Content-Type"];
         if (contentType.includes("application/json")) {
-            // For JSON content type
             data = JSON.parse(event.body);
         } else if (contentType.includes("application/x-www-form-urlencoded")) {
-            // For URL-encoded content type
             data = querystring.parse(event.body);
         } else {
             throw new Error('Unsupported content type');
@@ -40,22 +38,8 @@ exports.handler = async (event) => {
         };
     }
 
-    const path = event.path;
-
     let client;
     try {
-        // Log MongoDB URI to check if it's loading correctly
-        console.log('MongoDB URI:', process.env.MONGODB_URI);
-
-        // Ensure MongoDB URI is properly set
-        if (!process.env.MONGODB_URI) {
-            return {
-                statusCode: 500,
-                headers: { "X-Content-Type-Options": "nosniff" },
-                body: JSON.stringify({ error: 'MongoDB URI is missing from environment variables' }),
-            };
-        }
-
         client = new MongoClient(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -89,6 +73,9 @@ exports.handler = async (event) => {
             const hashedPassword = await bcrypt.hash(data.password, 10);
             await usersCollection.insertOne({ ...data, password: hashedPassword });
 
+            // Send email notification on registration
+            await sendEmail(data.email, 'Registration Successful', 'Welcome to our platform!');
+
             return {
                 statusCode: 201,
                 headers: { "X-Content-Type-Options": "nosniff" },
@@ -107,21 +94,8 @@ exports.handler = async (event) => {
                 };
             }
 
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.GMAIL_USER,
-                    pass: process.env.GMAIL_APP_PASSWORD,
-                },
-            });
-
-            const mailOptions = {
-                from: process.env.GMAIL_USER,
-                to: process.env.GMAIL_USER,
-                subject: 'User Login Notification',
-                text: `User ${user.email} logged in successfully.`,
-            };
-            await transporter.sendMail(mailOptions);
+            // Send email notification on login
+            await sendEmail(user.email, 'Login Successful', `User ${user.email} logged in successfully.`);
 
             return {
                 statusCode: 200,
@@ -176,4 +150,29 @@ function validateRegistrationForm(data) {
     }
 
     return null;
+}
+
+// Function to send email
+async function sendEmail(recipient, subject, text) {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.GMAIL_USER,
+            pass: process.env.GMAIL_APP_PASSWORD,
+        },
+    });
+
+    const mailOptions = {
+        from: process.env.GMAIL_USER,
+        to: recipient,
+        subject: subject,
+        text: text,
+    };
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent: ' + info.response);
+    } catch (error) {
+        console.error('Error sending email:', error.message);
+    }
 }
