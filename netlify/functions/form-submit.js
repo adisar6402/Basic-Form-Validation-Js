@@ -8,7 +8,10 @@ exports.handler = async (event) => {
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
-            headers: { "X-Content-Type-Options": "nosniff" },
+            headers: { 
+                "X-Content-Type-Options": "nosniff",
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ error: 'Method not allowed' }),
         };
     }
@@ -16,7 +19,6 @@ exports.handler = async (event) => {
     let data;
 
     try {
-        // Ensure event.body is properly parsed
         if (!event.body) {
             throw new Error('Request body is missing');
         }
@@ -33,7 +35,10 @@ exports.handler = async (event) => {
         console.error('Error parsing event.body:', parseError.message);
         return {
             statusCode: 400,
-            headers: { "X-Content-Type-Options": "nosniff" },
+            headers: { 
+                "X-Content-Type-Options": "nosniff",
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ error: 'Invalid JSON input or unsupported content type', details: parseError.message }),
         };
     }
@@ -56,7 +61,10 @@ exports.handler = async (event) => {
             if (validationError) {
                 return {
                     statusCode: 400,
-                    headers: { "X-Content-Type-Options": "nosniff" },
+                    headers: { 
+                        "X-Content-Type-Options": "nosniff",
+                        "Content-Type": "application/json"
+                    },
                     body: JSON.stringify(validationError),
                 };
             }
@@ -65,7 +73,10 @@ exports.handler = async (event) => {
             if (existingUser) {
                 return {
                     statusCode: 409,
-                    headers: { "X-Content-Type-Options": "nosniff" },
+                    headers: { 
+                        "X-Content-Type-Options": "nosniff",
+                        "Content-Type": "application/json"
+                    },
                     body: JSON.stringify({ field: 'email', message: 'User already exists.' }),
                 };
             }
@@ -78,7 +89,10 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 201,
-                headers: { "X-Content-Type-Options": "nosniff" },
+                headers: { 
+                    "X-Content-Type-Options": "nosniff",
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({ message: 'Registration successful.' }),
             };
         }
@@ -89,7 +103,10 @@ exports.handler = async (event) => {
             if (!user || !(await bcrypt.compare(data.password, user.password))) {
                 return {
                     statusCode: 401,
-                    headers: { "X-Content-Type-Options": "nosniff" },
+                    headers: { 
+                        "X-Content-Type-Options": "nosniff",
+                        "Content-Type": "application/json"
+                    },
                     body: JSON.stringify({ field: 'email', message: 'Invalid credentials.' }),
                 };
             }
@@ -99,7 +116,10 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 200,
-                headers: { "X-Content-Type-Options": "nosniff" },
+                headers: { 
+                    "X-Content-Type-Options": "nosniff",
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({ message: 'Login successful.' }),
             };
         }
@@ -107,14 +127,20 @@ exports.handler = async (event) => {
         // Invalid route
         return {
             statusCode: 404,
-            headers: { "X-Content-Type-Options": "nosniff" },
+            headers: { 
+                "X-Content-Type-Options": "nosniff",
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ error: 'Invalid route.' }),
         };
     } catch (error) {
         console.error('Error:', error.message);
         return {
             statusCode: 500,
-            headers: { "X-Content-Type-Options": "nosniff" },
+            headers: { 
+                "X-Content-Type-Options": "nosniff",
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ error: 'Internal Server Error', details: error.message }),
         };
     } finally {
@@ -124,7 +150,6 @@ exports.handler = async (event) => {
     }
 };
 
-// Registration validation function
 function validateRegistrationForm(data) {
     const { firstName, lastName, email, password, confirmPassword, country, terms } = data;
 
