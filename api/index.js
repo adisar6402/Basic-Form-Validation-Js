@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 require('dotenv').config();  // Load environment variables from .env file
 
 const app = express();
-const port = 6000;
 
 // Use body-parser to parse JSON request body
 app.use(bodyParser.json());
@@ -67,7 +66,6 @@ app.post('/submit-registration', (req, res) => {
     });
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+// Export the Express app for Vercel
+module.exports = app;  // Vercel requires this for serverless functions
+
